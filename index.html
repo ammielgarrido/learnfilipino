@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Learn Filipino through friendly picture lessons and quizzes.">
   <title>Learn Filipino</title>
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
   <header class="site-header">
@@ -49,12 +49,20 @@
       </div>
     </section>
 
+    <section class="checkpoint-section" aria-labelledby="checkpointTitle">
+      <div class="section-heading">
+        <div><p class="eyebrow">Cumulative review</p><h2 id="checkpointTitle">Remember everything</h2></div>
+        <p>After every two lessons, take a checkpoint that tests every word learned so far. Score 80% to complete it.</p>
+      </div>
+      <div class="checkpoint-grid" id="checkpointGrid"></div>
+    </section>
+
     <section class="quiz-section hidden" id="quiz" aria-labelledby="quizTitle">
       <div class="quiz-shell">
         <div class="quiz-topline"><span id="questionNumber">Question 1 of 10</span><span id="scoreText">Score: 0</span></div>
         <div class="quiz-progress" aria-hidden="true"><span id="quizProgressBar"></span></div>
         <div id="quizContent">
-          <p class="eyebrow">Choose the Filipino word</p>
+          <p class="eyebrow" id="quizLabel">Choose the Filipino word</p>
           <div class="quiz-emoji" id="quizEmoji" aria-hidden="true">😊</div>
           <h2 id="quizTitle">Which word means “Happy”?</h2>
           <div class="answer-grid" id="answerGrid"></div>
@@ -80,6 +88,6 @@
   </main>
 
   <footer><span>Made for little learners and their grown-ups.</span><span>Learn a little. Connect a lot.</span></footer>
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>
