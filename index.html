@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Learn Filipino through friendly picture lessons and quizzes.">
+  <title>Learn Filipino</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#home" aria-label="Learn Filipino home"><span class="brand-sun" aria-hidden="true">☀</span><span>Learn Filipino</span></a>
+    <div class="progress-pill" aria-label="Learning progress"><span aria-hidden="true">⭐</span><span id="progressText">0 of 10 learned</span></div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-copy">
+        <p class="eyebrow">Level 1 · Lesson 1</p>
+        <h1>Let’s learn <em>feelings.</em></h1>
+        <p>Look at each picture, read the Filipino word, and tap the speaker to hear it. When you’re ready, take the quiz.</p>
+        <a class="primary-button" href="#lesson">Start learning <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="hero-card" aria-label="Featured Filipino phrase">
+        <span class="hero-emoji" aria-hidden="true">😊</span>
+        <p>How do you feel?</p>
+        <strong>Kumusta ang pakiramdam mo?</strong>
+        <button class="sound-button light" type="button" data-speak="Kumusta ang pakiramdam mo?" aria-label="Hear Kumusta ang pakiramdam mo"><span aria-hidden="true">🔊</span> Listen</button>
+      </div>
+    </section>
+
+    <section class="lesson-section" id="lesson">
+      <div class="section-heading">
+        <div><p class="eyebrow">Ten new words</p><h2>Emotions and feelings</h2></div>
+        <p>Tap a card after you’ve practiced it. Your progress is saved on this device.</p>
+      </div>
+      <div class="word-grid" id="wordGrid" aria-live="polite"></div>
+      <div class="lesson-action">
+        <button class="primary-button" id="startQuiz" type="button">Take the quiz <span aria-hidden="true">→</span></button>
+        <p>Learn the cards first, then test yourself.</p>
+      </div>
+    </section>
+
+    <section class="quiz-section hidden" id="quiz" aria-labelledby="quizTitle">
+      <div class="quiz-shell">
+        <div class="quiz-topline"><span id="questionNumber">Question 1 of 10</span><span id="scoreText">Score: 0</span></div>
+        <div class="quiz-progress" aria-hidden="true"><span id="quizProgressBar"></span></div>
+        <div id="quizContent">
+          <p class="eyebrow">Choose the Filipino word</p>
+          <div class="quiz-emoji" id="quizEmoji" aria-hidden="true">😊</div>
+          <h2 id="quizTitle">Which word means “Happy”?</h2>
+          <div class="answer-grid" id="answerGrid"></div>
+          <p class="feedback" id="feedback" aria-live="assertive"></p>
+        </div>
+        <div class="results hidden" id="results" aria-live="polite">
+          <div class="result-badge" id="resultBadge" aria-hidden="true">🌟</div>
+          <p class="eyebrow">Lesson complete</p>
+          <h2 id="resultTitle">Great work!</h2>
+          <p id="resultMessage"></p>
+          <div class="result-actions">
+            <button class="primary-button" id="retryQuiz" type="button">Try again</button>
+            <button class="secondary-button" id="reviewWords" type="button">Review words</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="coming-next">
+      <div><p class="eyebrow">Coming next</p><h2>Items around the house</h2><p>Learn words for everyday objects such as a table, chair, door, window, and bed.</p></div>
+      <span class="lock" aria-label="Next lesson locked">🔒</span>
+    </section>
+  </main>
+
+  <footer><span>Made for little learners and their grown-ups.</span><span>Learn a little. Connect a lot.</span></footer>
+  <script src="script.js"></script>
+</body>
+</html>
