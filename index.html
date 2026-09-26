@@ -10,29 +10,37 @@
 <body>
   <header class="site-header">
     <a class="brand" href="#home" aria-label="Learn Filipino home"><span class="brand-sun" aria-hidden="true">☀</span><span>Learn Filipino</span></a>
-    <div class="progress-pill" aria-label="Learning progress"><span aria-hidden="true">⭐</span><span id="progressText">0 of 10 learned</span></div>
+    <div class="progress-pill" aria-label="Course progress"><span aria-hidden="true">⭐</span><span id="progressText">0 of 4 lessons</span></div>
   </header>
 
   <main>
     <section class="hero" id="home">
       <div class="hero-copy">
-        <p class="eyebrow">Level 1 · Lesson 1</p>
-        <h1>Let’s learn <em>feelings.</em></h1>
+        <p class="eyebrow" id="heroEyebrow">Level 1 · Lesson 1</p>
+        <h1>Let’s learn <em id="heroTopic">feelings.</em></h1>
         <p>Look at each picture, read the Filipino word, and tap the speaker to hear it. When you’re ready, take the quiz.</p>
         <a class="primary-button" href="#lesson">Start learning <span aria-hidden="true">→</span></a>
       </div>
       <div class="hero-card" aria-label="Featured Filipino phrase">
         <span class="hero-emoji" aria-hidden="true">😊</span>
-        <p>How do you feel?</p>
-        <strong>Kumusta ang pakiramdam mo?</strong>
-        <button class="sound-button light" type="button" data-speak="Kumusta ang pakiramdam mo?" aria-label="Hear Kumusta ang pakiramdam mo"><span aria-hidden="true">🔊</span> Listen</button>
+        <p id="heroPrompt">How do you feel?</p>
+        <strong id="heroPhrase">Kumusta ang pakiramdam mo?</strong>
+        <button class="sound-button light" id="heroSound" type="button" aria-label="Hear the featured phrase"><span aria-hidden="true">🔊</span> Listen</button>
       </div>
+    </section>
+
+    <section class="course-section" aria-labelledby="courseTitle">
+      <div class="section-heading">
+        <div><p class="eyebrow">Your learning path</p><h2 id="courseTitle">Four baby-step lessons</h2></div>
+        <p>Pass each quiz with 8 out of 10 to unlock the next lesson. You can return to completed lessons anytime.</p>
+      </div>
+      <div class="course-grid" id="courseGrid"></div>
     </section>
 
     <section class="lesson-section" id="lesson">
       <div class="section-heading">
-        <div><p class="eyebrow">Ten new words</p><h2>Emotions and feelings</h2></div>
-        <p>Tap a card after you’ve practiced it. Your progress is saved on this device.</p>
+        <div><p class="eyebrow" id="lessonLabel">Ten new words</p><h2 id="lessonTitle">Emotions and feelings</h2></div>
+        <p>Tap a card after you’ve practiced it. Your progress and best quiz score are saved automatically on this device.</p>
       </div>
       <div class="word-grid" id="wordGrid" aria-live="polite"></div>
       <div class="lesson-action">
@@ -65,9 +73,9 @@
       </div>
     </section>
 
-    <section class="coming-next">
-      <div><p class="eyebrow">Coming next</p><h2>Items around the house</h2><p>Learn words for everyday objects such as a table, chair, door, window, and bed.</p></div>
-      <span class="lock" aria-label="Next lesson locked">🔒</span>
+    <section class="save-note">
+      <span aria-hidden="true">💾</span>
+      <div><p class="eyebrow">Progress saves automatically</p><h2>Pick up where you left off</h2><p>This version saves in this browser on this device. A future account system can sync progress across phones, tablets, and computers.</p></div>
     </section>
   </main>
 
