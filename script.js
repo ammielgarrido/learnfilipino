@@ -42,12 +42,35 @@ const lessons = [
       ["Cook", "Tagapagluto", "Siya ay isang tagapagluto.", "🧑‍🍳"], ["Driver", "Drayber", "Siya ay isang drayber.", "🚌"],
       ["Carpenter", "Karpintero", "Siya ay isang karpintero.", "🔨"], ["Dentist", "Dentista", "Siya ay isang dentista.", "🦷"]
     ]
+  },
+  {
+    id: "family-1", level: 3, icon: "👨‍👩‍👧‍👦", topic: "family members", title: "Family members", reverseQuiz: true,
+    prompt: "Who is in your family?", phrase: "Sino ang nasa pamilya mo?",
+    words: [
+      ["Family", "Pamilya", "Ito ang pamilya ko.", "👨‍👩‍👧‍👦"], ["Mother", "Nanay", "Siya ang nanay ko.", "👩"],
+      ["Father", "Tatay", "Siya ang tatay ko.", "👨"], ["Older sister", "Ate", "Siya ang ate ko.", "👧"],
+      ["Older brother", "Kuya", "Siya ang kuya ko.", "👦"], ["Grandmother", "Lola", "Siya ang lola ko.", "👵"],
+      ["Grandfather", "Lolo", "Siya ang lolo ko.", "👴"], ["Child", "Anak", "Siya ang anak ko.", "🧒"],
+      ["Aunt", "Tita", "Siya ang tita ko.", "👩‍🦱"], ["Uncle", "Tito", "Siya ang tito ko.", "👨‍🦱"]
+    ]
+  },
+  {
+    id: "food-1", level: 3, icon: "🍲", topic: "food and drinks", title: "Food and drinks", reverseQuiz: true,
+    prompt: "What would you like to eat?", phrase: "Ano ang gusto mong kainin?",
+    words: [
+      ["Rice", "Kanin", "Gusto ko ng kanin.", "🍚"], ["Bread", "Tinapay", "Gusto ko ng tinapay.", "🍞"],
+      ["Fish", "Isda", "Gusto ko ng isda.", "🐟"], ["Chicken", "Manok", "Gusto ko ng manok.", "🍗"],
+      ["Egg", "Itlog", "Gusto ko ng itlog.", "🥚"], ["Fruit", "Prutas", "Gusto ko ng prutas.", "🍎"],
+      ["Vegetable", "Gulay", "Gusto ko ng gulay.", "🥬"], ["Water", "Tubig", "Gusto ko ng tubig.", "💧"],
+      ["Milk", "Gatas", "Gusto ko ng gatas.", "🥛"], ["Juice", "Katas", "Gusto ko ng katas.", "🧃"]
+    ]
   }
 ].map(lesson => ({...lesson, words: lesson.words.map(([english, filipino, phrase, emoji]) => ({english, filipino, phrase, emoji}))}));
 
 const checkpoints = [
   {id: "checkpoint-1", title: "Level 1 Checkpoint", icon: "🏅", lessonCount: 2, detail: "All 20 words from Lessons 1–2"},
-  {id: "checkpoint-2", title: "Level 2 Checkpoint", icon: "🏆", lessonCount: 4, detail: "All 40 words from Lessons 1–4"}
+  {id: "checkpoint-2", title: "Level 2 Checkpoint", icon: "🏆", lessonCount: 4, detail: "All 40 words from Lessons 1–4"},
+  {id: "checkpoint-3", title: "Level 3 Checkpoint", icon: "🌟", lessonCount: 6, detail: "All 60 words from Lessons 1–6", mixedDirections: true}
 ];
 
 const storageKey = "learn-filipino:course-progress-v2";
@@ -95,7 +118,8 @@ function lessonProgress(index = currentLessonIndex) { return progress.lessons[le
 function isUnlocked(index) {
   if (index === 0) return true;
   if (!progress.lessons[lessons[index - 1].id].completed) return false;
-  return index !== 2 || progress.checkpoints["checkpoint-1"].completed;
+  const checkpointBeforeLevel = checkpoints.find(checkpoint => checkpoint.lessonCount === index);
+  return !checkpointBeforeLevel || progress.checkpoints[checkpointBeforeLevel.id].completed;
 }
 function checkpointWords(checkpoint) { return lessons.slice(0, checkpoint.lessonCount).flatMap(lesson => lesson.words); }
 function isCheckpointUnlocked(checkpoint) { return lessons.slice(0, checkpoint.lessonCount).every(lesson => progress.lessons[lesson.id].completed); }
@@ -125,8 +149,9 @@ function renderCourse() {
     card.type = "button";
     card.disabled = !unlocked;
     card.className = `course-card${index === currentLessonIndex ? " active" : ""}${saved.completed ? " complete" : ""}`;
-    const needsCheckpoint = index === 2 && lessonProgress(1).completed && !progress.checkpoints["checkpoint-1"].completed;
-    const status = !unlocked ? needsCheckpoint ? "🔒 Pass the Level 1 Checkpoint" : "🔒 Pass the previous quiz" : saved.completed ? `Completed · Best ${saved.bestScore}/10` : saved.bestScore ? `Best score ${saved.bestScore}/10` : "Ready to learn";
+    const requiredCheckpoint = checkpoints.find(checkpoint => checkpoint.lessonCount === index);
+    const needsCheckpoint = requiredCheckpoint && lessonProgress(index - 1).completed && !progress.checkpoints[requiredCheckpoint.id].completed;
+    const status = !unlocked ? needsCheckpoint ? `🔒 Pass the ${requiredCheckpoint.title}` : "🔒 Pass the previous quiz" : saved.completed ? `Completed · Best ${saved.bestScore}/10` : saved.bestScore ? `Best score ${saved.bestScore}/10` : "Ready to learn";
     card.innerHTML = `<span class="course-icon" aria-hidden="true">${lesson.icon}</span><span class="course-number">Level ${lesson.level} · Lesson ${index + 1}</span><span class="course-name">${lesson.title}</span><span class="course-status">${status}</span>`;
     card.addEventListener("click", () => selectLesson(index));
     courseGrid.appendChild(card);
@@ -189,8 +214,13 @@ function selectLesson(index) {
 }
 
 function shuffle(items) { return [...items].sort(() => Math.random() - .5); }
-function makeQuestions(words) {
-  return shuffle(words.map(word => ({word, options: shuffle([word, ...shuffle(words.filter(candidate => candidate !== word)).slice(0, 3)])})));
+function makeQuestions(words, directionMode = "forward") {
+  const ordered = shuffle(words);
+  return ordered.map((word, index) => ({
+    word,
+    direction: directionMode === "mixed" ? (index % 2 ? "reverse" : "forward") : directionMode,
+    options: shuffle([word, ...shuffle(words.filter(candidate => candidate !== word)).slice(0, 3)])
+  }));
 }
 
 function showQuestion() {
@@ -199,23 +229,26 @@ function showQuestion() {
   document.querySelector("#scoreText").textContent = `Score: ${score}`;
   document.querySelector("#quizProgressBar").style.width = `${((questionIndex + 1) / questions.length) * 100}%`;
   document.querySelector("#quizEmoji").textContent = current.word.emoji;
-  document.querySelector("#quizTitle").textContent = `Which word means “${current.word.english}”?`;
+  const reverse = current.direction === "reverse";
+  document.querySelector("#quizTitle").textContent = reverse ? `What does “${current.word.filipino}” mean?` : `Which word means “${current.word.english}”?`;
   feedback.textContent = ""; feedback.className = "feedback"; answerGrid.innerHTML = "";
   current.options.forEach(option => {
     const button = document.createElement("button");
-    button.className = "answer-button"; button.type = "button"; button.lang = "fil"; button.textContent = option.filipino;
-    button.addEventListener("click", () => checkAnswer(button, option, current.word));
+    button.className = "answer-button"; button.type = "button"; button.lang = reverse ? "en" : "fil"; button.textContent = reverse ? option.english : option.filipino;
+    button.addEventListener("click", () => checkAnswer(button, option, current));
     answerGrid.appendChild(button);
   });
 }
 
-function checkAnswer(button, selected, correct) {
+function checkAnswer(button, selected, question) {
+  const correct = question.word;
+  const correctLabel = question.direction === "reverse" ? correct.english : correct.filipino;
   const buttons = [...answerGrid.querySelectorAll("button")];
   buttons.forEach(item => { item.disabled = true; });
   if (selected === correct) {
     score += 1; button.classList.add("correct"); feedback.textContent = `Tama! ${correct.filipino} means ${correct.english}.`; feedback.classList.add("good"); speak(correct.phrase);
   } else {
-    button.classList.add("wrong"); buttons.find(item => item.textContent === correct.filipino)?.classList.add("correct"); feedback.textContent = `Almost! The answer is ${correct.filipino}.`; feedback.classList.add("try"); mistakes.push(correct); speak(correct.phrase, true);
+    button.classList.add("wrong"); buttons.find(item => item.textContent === correctLabel)?.classList.add("correct"); feedback.textContent = `Almost! ${correct.filipino} means ${correct.english}.`; feedback.classList.add("try"); mistakes.push(correct); speak(correct.phrase, true);
   }
   document.querySelector("#scoreText").textContent = `Score: ${score}`;
   window.setTimeout(() => { questionIndex += 1; questionIndex < questions.length ? showQuestion() : showResults(); }, 1600);
@@ -234,14 +267,18 @@ function showResults() {
     saved.bestScore = Math.max(saved.bestScore, score);
     if (passed) saved.completed = true;
     completedName = checkpoint.title;
-    if (passed && activeQuiz.index === 0) nextText = " Level 2 is now unlocked!";
+    if (passed && activeQuiz.index < checkpoints.length - 1) nextText = ` Level ${activeQuiz.index + 2} is now unlocked!`;
   } else {
     const lesson = lessons[currentLessonIndex];
     const saved = lessonProgress();
     saved.bestScore = Math.max(saved.bestScore, score);
     if (passed) { saved.completed = true; saved.learned = lesson.words.map((_, index) => index); }
     completedName = lesson.title;
-    if (passed && currentLessonIndex < lessons.length - 1) nextText = currentLessonIndex === 1 ? " The Level 1 Checkpoint is now unlocked!" : ` Lesson ${currentLessonIndex + 2} is now unlocked!`;
+    if (passed) {
+      const unlockedCheckpoint = checkpoints.find(checkpoint => checkpoint.lessonCount === currentLessonIndex + 1);
+      if (unlockedCheckpoint) nextText = ` The ${unlockedCheckpoint.title} is now unlocked!`;
+      else if (currentLessonIndex < lessons.length - 1) nextText = ` Lesson ${currentLessonIndex + 2} is now unlocked!`;
+    }
   }
   document.querySelector("#resultBadge").textContent = passed ? "🌟" : "🌱";
   document.querySelector("#resultTitle").textContent = passed ? "Ang galing!" : "You’re growing!";
@@ -249,8 +286,8 @@ function showResults() {
   saveProgress(); renderLesson();
 }
 
-function beginQuiz(words, label) {
-  questions = makeQuestions(words); questionIndex = 0; score = 0; mistakes = [];
+function beginQuiz(words, label, directionMode = "forward") {
+  questions = makeQuestions(words, directionMode); questionIndex = 0; score = 0; mistakes = [];
   document.querySelector("#quizLabel").textContent = label;
   quizContent.classList.remove("hidden"); results.classList.add("hidden"); quizSection.classList.remove("hidden");
   showQuestion(); quizSection.scrollIntoView({behavior: "smooth", block: "start"});
@@ -258,14 +295,15 @@ function beginQuiz(words, label) {
 
 function startQuiz() {
   activeQuiz = {type: "lesson", index: currentLessonIndex};
-  beginQuiz(lessons[currentLessonIndex].words, "Choose the Filipino word");
+  const lesson = lessons[currentLessonIndex];
+  beginQuiz(lesson.words, lesson.reverseQuiz ? "English ↔ Filipino challenge" : "Choose the Filipino word", lesson.reverseQuiz ? "mixed" : "forward");
 }
 
 function startCheckpoint(index) {
   const checkpoint = checkpoints[index];
   if (!isCheckpointUnlocked(checkpoint)) return;
   activeQuiz = {type: "checkpoint", index};
-  beginQuiz(checkpointWords(checkpoint), `${checkpoint.title} · Every learned word`);
+  beginQuiz(checkpointWords(checkpoint), `${checkpoint.title} · Every learned word`, checkpoint.mixedDirections ? "mixed" : "forward");
 }
 
 function retryActiveQuiz() {

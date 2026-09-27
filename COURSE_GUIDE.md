@@ -23,6 +23,9 @@ This file is the main curriculum reference for the Learn Filipino website. Updat
 | Level 2, Lesson 3 | Places we visit | 10-question quiz | Pass Level 1 Checkpoint |
 | Level 2, Lesson 4 | People and professions | 10-question quiz | Complete Lesson 3 |
 | Level 2 Checkpoint | All 40 words from Lessons 1–4 | 40-question cumulative test | Complete Lessons 1–4 |
+| Level 3, Lesson 5 | Family members | 10-question mixed-direction quiz | Pass Level 2 Checkpoint |
+| Level 3, Lesson 6 | Food and drinks | 10-question mixed-direction quiz | Complete Lesson 5 |
+| Level 3 Checkpoint | All 60 words from Lessons 1–6 | 60-question mixed-direction test | Complete Lessons 1–6 |
 
 ## Included vocabulary
 
@@ -86,6 +89,36 @@ This file is the main curriculum reference for the Learn Filipino website. Updat
 | Carpenter | Karpintero |
 | Dentist | Dentista |
 
+### Lesson 5: Family members
+
+| English | Filipino |
+| --- | --- |
+| Family | Pamilya |
+| Mother | Nanay |
+| Father | Tatay |
+| Older sister | Ate |
+| Older brother | Kuya |
+| Grandmother | Lola |
+| Grandfather | Lolo |
+| Child | Anak |
+| Aunt | Tita |
+| Uncle | Tito |
+
+### Lesson 6: Food and drinks
+
+| English | Filipino |
+| --- | --- |
+| Rice | Kanin |
+| Bread | Tinapay |
+| Fish | Isda |
+| Chicken | Manok |
+| Egg | Itlog |
+| Fruit | Prutas |
+| Vegetable | Gulay |
+| Water | Tubig |
+| Milk | Gatas |
+| Juice | Katas |
+
 ## Progress saving
 
 The current website uses browser `localStorage` and saves:
@@ -132,4 +165,4 @@ Use short scenarios such as greeting family, asking for food, describing feeling
 
 ## Next recommended expansion
 
-Build Level 3 with two lessons—Family Members and Food and Drinks—followed by a 60-word cumulative checkpoint. Introduce reverse questions in those lessons so the learner must recognize both English-to-Filipino and Filipino-to-English translations.
+Build Level 4 with two phrase-based lessons using patterns such as `Ito ang...`, `Gusto ko...`, `Nasaan ang...`, and `Pupunta ako sa...`. Add sentence-building and missing-word questions, followed by a cumulative checkpoint.
