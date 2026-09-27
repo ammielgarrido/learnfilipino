@@ -74,7 +74,7 @@ const checkpoints = [
 ];
 
 const storageKey = "learn-filipino:course-progress-v2";
-const reviewMode = new URLSearchParams(window.location.search).get("review") === "1";
+const reviewMode = new URLSearchParams(window.location.search).get("review") === "1" || window.location.hash === "#review";
 let progress = loadProgress();
 let currentLessonIndex = Math.min(progress.currentLesson || 0, lessons.length - 1);
 let questions = [], questionIndex = 0, score = 0, mistakes = [];
