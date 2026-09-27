@@ -54,7 +54,7 @@ This file is the main curriculum reference for the Learn Filipino website. Updat
 | Door | Pinto |
 | Window | Bintana |
 | Bed | Kama |
-| Lamp | Ilaw |
+| Lamp | Lampara |
 | Spoon | Kutsara |
 | Plate | Plato |
 | Cup | Tasa |

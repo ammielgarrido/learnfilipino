@@ -14,10 +14,10 @@ const lessons = [
     id: "home-1", level: 1, icon: "🏠", topic: "home words", title: "Items around the house",
     prompt: "What is inside the house?", phrase: "Ano ang nasa loob ng bahay?",
     words: [
-      ["House", "Bahay", "Ito ang bahay.", "🏠"], ["Table", "Mesa", "Ito ang mesa.", "🪑"],
+      ["House", "Bahay", "Ito ang bahay.", "🏠"], ["Table", "Mesa", "Ito ang mesa.", "", "assets/table.png"],
       ["Chair", "Upuan", "Ito ang upuan.", "🪑"], ["Door", "Pinto", "Ito ang pinto.", "🚪"],
       ["Window", "Bintana", "Ito ang bintana.", "🪟"], ["Bed", "Kama", "Ito ang kama.", "🛏️"],
-      ["Lamp", "Ilaw", "Ito ang ilaw.", "💡"], ["Spoon", "Kutsara", "Ito ang kutsara.", "🥄"],
+      ["Lamp", "Lampara", "Ito ang lampara.", "💡"], ["Spoon", "Kutsara", "Ito ang kutsara.", "🥄"],
       ["Plate", "Plato", "Ito ang plato.", "🍽️"], ["Cup", "Tasa", "Ito ang tasa.", "☕"]
     ]
   },
@@ -65,7 +65,7 @@ const lessons = [
       ["Milk", "Gatas", "Gusto ko ng gatas.", "🥛"], ["Juice", "Katas", "Gusto ko ng katas.", "🧃"]
     ]
   }
-].map(lesson => ({...lesson, words: lesson.words.map(([english, filipino, phrase, emoji]) => ({english, filipino, phrase, emoji}))}));
+].map(lesson => ({...lesson, words: lesson.words.map(([english, filipino, phrase, emoji, image]) => ({english, filipino, phrase, emoji, image}))}));
 
 const checkpoints = [
   {id: "checkpoint-1", title: "Level 1 Checkpoint", icon: "🏅", lessonCount: 2, detail: "All 20 words from Lessons 1–2"},
@@ -190,7 +190,8 @@ function renderLesson() {
     card.className = `word-card${saved.learned.includes(index) ? " learned" : ""}`;
     card.tabIndex = 0;
     card.setAttribute("aria-label", `${word.english}: ${word.filipino}. Mark as practiced.`);
-    card.innerHTML = `<span class="word-emoji" aria-hidden="true">${word.emoji}</span><span class="word-english">${word.english}</span><span class="word-filipino" lang="fil">${word.filipino}</span><button class="sound-button" type="button" aria-label="Hear ${word.filipino}"><span aria-hidden="true">🔊</span> Hear it</button>`;
+    const visual = word.image ? `<img class="word-image" src="${word.image}" alt="">` : `<span class="word-emoji" aria-hidden="true">${word.emoji}</span>`;
+    card.innerHTML = `${visual}<span class="word-english">${word.english}</span><span class="word-filipino" lang="fil">${word.filipino}</span><button class="sound-button" type="button" aria-label="Hear ${word.filipino}"><span aria-hidden="true">🔊</span> Hear it</button>`;
     const mark = () => {
       if (!saved.learned.includes(index)) saved.learned.push(index);
       card.classList.add("learned"); saveProgress();
@@ -228,7 +229,8 @@ function showQuestion() {
   document.querySelector("#questionNumber").textContent = `Question ${questionIndex + 1} of ${questions.length}`;
   document.querySelector("#scoreText").textContent = `Score: ${score}`;
   document.querySelector("#quizProgressBar").style.width = `${((questionIndex + 1) / questions.length) * 100}%`;
-  document.querySelector("#quizEmoji").textContent = current.word.emoji;
+  const quizVisual = document.querySelector("#quizEmoji");
+  quizVisual.innerHTML = current.word.image ? `<img src="${current.word.image}" alt="">` : current.word.emoji;
   const reverse = current.direction === "reverse";
   document.querySelector("#quizTitle").textContent = reverse ? `What does “${current.word.filipino}” mean?` : `Which word means “${current.word.english}”?`;
   feedback.textContent = ""; feedback.className = "feedback"; answerGrid.innerHTML = "";
