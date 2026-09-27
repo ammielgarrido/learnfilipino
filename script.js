@@ -74,6 +74,7 @@ const checkpoints = [
 ];
 
 const storageKey = "learn-filipino:course-progress-v2";
+const reviewMode = new URLSearchParams(window.location.search).get("review") === "1";
 let progress = loadProgress();
 let currentLessonIndex = Math.min(progress.currentLesson || 0, lessons.length - 1);
 let questions = [], questionIndex = 0, score = 0, mistakes = [];
@@ -110,19 +111,21 @@ function loadProgress() {
 }
 
 function saveProgress() {
+  if (reviewMode) return;
   progress.currentLesson = currentLessonIndex;
   localStorage.setItem(storageKey, JSON.stringify(progress));
 }
 
 function lessonProgress(index = currentLessonIndex) { return progress.lessons[lessons[index].id]; }
 function isUnlocked(index) {
+  if (reviewMode) return true;
   if (index === 0) return true;
   if (!progress.lessons[lessons[index - 1].id].completed) return false;
   const checkpointBeforeLevel = checkpoints.find(checkpoint => checkpoint.lessonCount === index);
   return !checkpointBeforeLevel || progress.checkpoints[checkpointBeforeLevel.id].completed;
 }
 function checkpointWords(checkpoint) { return lessons.slice(0, checkpoint.lessonCount).flatMap(lesson => lesson.words); }
-function isCheckpointUnlocked(checkpoint) { return lessons.slice(0, checkpoint.lessonCount).every(lesson => progress.lessons[lesson.id].completed); }
+function isCheckpointUnlocked(checkpoint) { return reviewMode || lessons.slice(0, checkpoint.lessonCount).every(lesson => progress.lessons[lesson.id].completed); }
 
 function speak(text, slow = false) {
   if (!("speechSynthesis" in window)) { alert("Audio is not supported in this browser yet."); return; }
@@ -316,4 +319,8 @@ document.querySelector("#heroSound").addEventListener("click", () => speak(lesso
 document.querySelector("#startQuiz").addEventListener("click", startQuiz);
 document.querySelector("#retryQuiz").addEventListener("click", retryActiveQuiz);
 document.querySelector("#reviewWords").addEventListener("click", () => document.querySelector("#lesson").scrollIntoView({behavior: "smooth"}));
+if (reviewMode) {
+  document.body.classList.add("review-mode");
+  document.querySelector("#reviewBanner").classList.remove("hidden");
+}
 renderLesson();
