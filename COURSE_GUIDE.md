@@ -4,12 +4,12 @@ This file is the main curriculum reference for the Learn Filipino website. Updat
 
 ## Learning approach
 
-- Teach 10 useful words at a time.
+- Teach 10 useful words or phrases at a time.
 - Show an English meaning, a Filipino word, a child-friendly visual, and a short spoken example.
 - Let the learner mark words as practiced.
 - End every lesson with a 10-question quiz.
 - Require 8/10 to complete a lesson.
-- After every two lessons, test every word learned so far in a cumulative checkpoint.
+- After every two lessons, test every word and phrase learned so far in a cumulative checkpoint.
 - Require 80% to complete a checkpoint.
 - Increase difficulty from single words to phrases, listening, recall, and simple conversation.
 
@@ -26,6 +26,9 @@ This file is the main curriculum reference for the Learn Filipino website. Updat
 | Level 3, Lesson 5 | Family members | 10-question mixed-direction quiz | Pass Level 2 Checkpoint |
 | Level 3, Lesson 6 | Food and drinks | 10-question mixed-direction quiz | Complete Lesson 5 |
 | Level 3 Checkpoint | All 60 words from Lessons 1–6 | 60-question mixed-direction test | Complete Lessons 1–6 |
+| Level 4, Lesson 7 | Naming things and saying what you want | 10 questions: five missing-word, five sentence-building | Pass Level 3 Checkpoint |
+| Level 4, Lesson 8 | Finding things and going places | 10 questions: five missing-word, five sentence-building | Complete Lesson 7 |
+| Level 4 Checkpoint | All 60 words and 20 phrases from Lessons 1–8 | 80 questions: mixed-direction vocabulary plus phrase exercises | Complete Lessons 1–8 |
 
 ## Included vocabulary
 
@@ -119,6 +122,42 @@ This file is the main curriculum reference for the Learn Filipino website. Updat
 | Milk | Gatas |
 | Juice | Katas |
 
+### Lesson 7: Naming things and saying what you want
+
+Patterns: `Ito ang…` (This is the…) and `Gusto ko ng…` (I want…).
+
+| English | Filipino |
+| --- | --- |
+| This is the house. | Ito ang bahay. |
+| This is the table. | Ito ang mesa. |
+| This is the chair. | Ito ang upuan. |
+| This is the spoon. | Ito ang kutsara. |
+| This is the plate. | Ito ang plato. |
+| I want rice. | Gusto ko ng kanin. |
+| I want bread. | Gusto ko ng tinapay. |
+| I want water. | Gusto ko ng tubig. |
+| I want milk. | Gusto ko ng gatas. |
+| I want fruit. | Gusto ko ng prutas. |
+
+### Lesson 8: Finding things and going places
+
+Patterns: `Nasaan ang…?` (Where is the…?) and `Pupunta ako sa…` (I will go to…).
+
+| English | Filipino |
+| --- | --- |
+| Where is the house? | Nasaan ang bahay? |
+| Where is the table? | Nasaan ang mesa? |
+| Where is the chair? | Nasaan ang upuan? |
+| Where is the spoon? | Nasaan ang kutsara? |
+| Where is the plate? | Nasaan ang plato? |
+| I will go to school. | Pupunta ako sa paaralan. |
+| I will go to the park. | Pupunta ako sa parke. |
+| I will go to the market. | Pupunta ako sa palengke. |
+| I will go to the store. | Pupunta ako sa tindahan. |
+| I will go to the beach. | Pupunta ako sa tabing-dagat. |
+
+Phrase quizzes hide the final noun for missing-word questions. Sentence-building questions let learners tap shuffled words, undo the last selection, and submit when all words are selected. Each lesson includes five of each type. The Level 4 checkpoint includes all 80 entries once, with ten questions of each phrase type; passing requires 64/80.
+
 ## Progress saving
 
 The current website uses browser `localStorage` and saves:
@@ -142,7 +181,7 @@ Add reverse questions: show the Filipino word and ask for the English meaning. M
 
 ### Level 4: Useful phrases
 
-Combine known words into short patterns such as `Ito ang...`, `Gusto ko...`, `Nasaan ang...`, and `Pupunta ako sa...`. Add sentence-building and missing-word questions.
+Implemented in Lessons 7–8: known words combined into `Ito ang…`, `Gusto ko ng…`, `Nasaan ang…?`, and `Pupunta ako sa…`. Includes sentence-building, missing-word questions, and a cumulative checkpoint.
 
 ### Level 5: Listening and speaking
 
@@ -154,7 +193,7 @@ Use short scenarios such as greeting family, asking for food, describing feeling
 
 ## Content checklist for every new lesson
 
-1. Choose one child-relevant theme and exactly 10 words.
+1. Choose one child-relevant theme and exactly 10 words or phrases.
 2. Verify spelling, meaning, natural usage, and regional alternatives with a fluent Filipino speaker.
 3. Add a clear visual and one short example phrase per word.
 4. Check pronunciation audio on mobile and desktop.
@@ -165,4 +204,4 @@ Use short scenarios such as greeting family, asking for food, describing feeling
 
 ## Next recommended expansion
 
-Build Level 4 with two phrase-based lessons using patterns such as `Ito ang...`, `Gusto ko...`, `Nasaan ang...`, and `Pupunta ako sa...`. Add sentence-building and missing-word questions, followed by a cumulative checkpoint.
+Build Level 5 listening exercises: play audio without showing the word or phrase, then ask the learner to choose the matching visual. Verify Filipino pronunciation on target devices before publishing listening assessments. Optional microphone practice remains a later addition.

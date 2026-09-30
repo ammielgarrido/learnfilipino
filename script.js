@@ -65,12 +65,47 @@ const lessons = [
       ["Milk", "Gatas", "Gusto ko ng gatas.", "🥛"], ["Juice", "Katas", "Gusto ko ng katas.", "🧃"]
     ]
   }
-].map(lesson => ({...lesson, words: lesson.words.map(([english, filipino, phrase, emoji, image]) => ({english, filipino, phrase, emoji, image}))}));
+  , {
+    id: "phrases-1", level: 4, icon: "💬", topic: "useful phrases", title: "Naming things and saying what you want", phraseLesson: true,
+    prompt: "What would you like?", phrase: "Ano ang gusto mo?",
+    words: [
+      ["This is the house.", "Ito ang bahay.", "Ito ang bahay.", "🏠"],
+      ["This is the table.", "Ito ang mesa.", "Ito ang mesa.", "", "assets/table.png"],
+      ["This is the chair.", "Ito ang upuan.", "Ito ang upuan.", "🪑"],
+      ["This is the spoon.", "Ito ang kutsara.", "Ito ang kutsara.", "🥄"],
+      ["This is the plate.", "Ito ang plato.", "Ito ang plato.", "🍽️"],
+      ["I want rice.", "Gusto ko ng kanin.", "Gusto ko ng kanin.", "🍚"],
+      ["I want bread.", "Gusto ko ng tinapay.", "Gusto ko ng tinapay.", "🍞"],
+      ["I want water.", "Gusto ko ng tubig.", "Gusto ko ng tubig.", "💧"],
+      ["I want milk.", "Gusto ko ng gatas.", "Gusto ko ng gatas.", "🥛"],
+      ["I want fruit.", "Gusto ko ng prutas.", "Gusto ko ng prutas.", "🍎"]
+    ],
+    patterns: "Ito ang… = This is the… · Gusto ko ng… = I want…"
+  },
+  {
+    id: "phrases-2", level: 4, icon: "🧭", topic: "asking and going", title: "Finding things and going places", phraseLesson: true,
+    prompt: "Where is the table?", phrase: "Nasaan ang mesa?",
+    words: [
+      ["Where is the house?", "Nasaan ang bahay?", "Nasaan ang bahay?", "🏠"],
+      ["Where is the table?", "Nasaan ang mesa?", "Nasaan ang mesa?", "", "assets/table.png"],
+      ["Where is the chair?", "Nasaan ang upuan?", "Nasaan ang upuan?", "🪑"],
+      ["Where is the spoon?", "Nasaan ang kutsara?", "Nasaan ang kutsara?", "🥄"],
+      ["Where is the plate?", "Nasaan ang plato?", "Nasaan ang plato?", "🍽️"],
+      ["I will go to school.", "Pupunta ako sa paaralan.", "Pupunta ako sa paaralan.", "🏫"],
+      ["I will go to the park.", "Pupunta ako sa parke.", "Pupunta ako sa parke.", "🌳"],
+      ["I will go to the market.", "Pupunta ako sa palengke.", "Pupunta ako sa palengke.", "🧺"],
+      ["I will go to the store.", "Pupunta ako sa tindahan.", "Pupunta ako sa tindahan.", "🏪"],
+      ["I will go to the beach.", "Pupunta ako sa tabing-dagat.", "Pupunta ako sa tabing-dagat.", "🏖️"]
+    ],
+    patterns: "Nasaan ang…? = Where is the…? · Pupunta ako sa… = I will go to…"
+  }
+].map(lesson => ({...lesson, words: lesson.words.map(([english, filipino, phrase, emoji, image]) => ({english, filipino, phrase, emoji, image, phraseLesson: !!lesson.phraseLesson}))}));
 
 const checkpoints = [
   {id: "checkpoint-1", title: "Level 1 Checkpoint", icon: "🏅", lessonCount: 2, detail: "All 20 words from Lessons 1–2"},
   {id: "checkpoint-2", title: "Level 2 Checkpoint", icon: "🏆", lessonCount: 4, detail: "All 40 words from Lessons 1–4"},
-  {id: "checkpoint-3", title: "Level 3 Checkpoint", icon: "🌟", lessonCount: 6, detail: "All 60 words from Lessons 1–6", mixedDirections: true}
+  {id: "checkpoint-3", title: "Level 3 Checkpoint", icon: "🌟", lessonCount: 6, detail: "All 60 words from Lessons 1–6", mixedDirections: true},
+  {id: "checkpoint-4", title: "Level 4 Checkpoint", icon: "💬", lessonCount: 8, detail: "All 60 words and 20 phrases from Lessons 1–8", mixedDirections: true}
 ];
 
 const storageKey = "learn-filipino:course-progress-v2";
@@ -79,6 +114,7 @@ let progress = loadProgress();
 let currentLessonIndex = Math.min(progress.currentLesson || 0, lessons.length - 1);
 let questions = [], questionIndex = 0, score = 0, mistakes = [];
 let activeQuiz = {type: "lesson", index: currentLessonIndex};
+let answerTimer;
 
 const wordGrid = document.querySelector("#wordGrid");
 const courseGrid = document.querySelector("#courseGrid");
@@ -186,7 +222,9 @@ function renderLesson() {
   document.querySelector("#heroPrompt").textContent = lesson.prompt;
   document.querySelector("#heroPhrase").textContent = lesson.phrase;
   document.querySelector("#lessonTitle").textContent = lesson.title;
-  document.querySelector("#lessonLabel").textContent = `Ten new words · Best quiz ${saved.bestScore}/10`;
+  document.querySelector("#lessonLabel").textContent = `${lesson.phraseLesson ? "Ten useful phrases" : "Ten new words"} · Best quiz ${saved.bestScore}/10`;
+  document.querySelector("#patternNote").textContent = lesson.patterns || "";
+  document.querySelector("#patternNote").classList.toggle("hidden", !lesson.patterns);
   wordGrid.innerHTML = "";
   lesson.words.forEach((word, index) => {
     const card = document.createElement("article");
@@ -211,20 +249,40 @@ function renderLesson() {
 
 function selectLesson(index) {
   if (!isUnlocked(index)) return;
+  window.clearTimeout(answerTimer);
   currentLessonIndex = index; saveProgress();
   quizSection.classList.add("hidden");
   renderLesson();
   document.querySelector("#lesson").scrollIntoView({behavior: "smooth", block: "start"});
 }
 
-function shuffle(items) { return [...items].sort(() => Math.random() - .5); }
+function shuffle(items) {
+  const shuffled = [...items];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+function phraseTokens(word) { return word.filipino.replace(/[.?]$/u, "").split(" "); }
 function makeQuestions(words, directionMode = "forward") {
   const ordered = shuffle(words);
-  return ordered.map((word, index) => ({
-    word,
-    direction: directionMode === "mixed" ? (index % 2 ? "reverse" : "forward") : directionMode,
-    options: shuffle([word, ...shuffle(words.filter(candidate => candidate !== word)).slice(0, 3)])
-  }));
+  let phraseIndex = 0;
+  return ordered.map((word, index) => {
+    if (word.phraseLesson) {
+      const type = phraseIndex++ % 2 ? "build" : "missing";
+      const tokens = phraseTokens(word);
+      const missingIndex = tokens.length - 1;
+      const distractors = [...new Set(words.filter(candidate => candidate.phraseLesson && candidate !== word)
+        .map(candidate => phraseTokens(candidate).at(-1)))].filter(token => token !== tokens[missingIndex]);
+      return {word, type, tokens, missingIndex,
+        options: type === "missing" ? shuffle([tokens[missingIndex], ...shuffle(distractors).slice(0, 3)]) : shuffle(tokens.map((token, id) => ({token, id})))};
+    }
+    const vocabulary = words.filter(candidate => !candidate.phraseLesson);
+    return {word, type: "choice",
+      direction: directionMode === "mixed" ? (index % 2 ? "reverse" : "forward") : directionMode,
+      options: shuffle([word, ...shuffle(vocabulary.filter(candidate => candidate !== word)).slice(0, 3)])};
+  });
 }
 
 function showQuestion() {
@@ -235,8 +293,13 @@ function showQuestion() {
   const quizVisual = document.querySelector("#quizEmoji");
   quizVisual.innerHTML = current.word.image ? `<img src="${current.word.image}" alt="">` : current.word.emoji;
   const reverse = current.direction === "reverse";
+  document.querySelector("#quizLabel").textContent = activeQuiz.type === "checkpoint" ? `${checkpoints[activeQuiz.index].title} · Cumulative review` : "English ↔ Filipino challenge";
   document.querySelector("#quizTitle").textContent = reverse ? `What does “${current.word.filipino}” mean?` : `Which word means “${current.word.english}”?`;
   feedback.textContent = ""; feedback.className = "feedback"; answerGrid.innerHTML = "";
+  if (current.type === "missing" || current.type === "build") {
+    renderPhraseQuestion(current);
+    return;
+  }
   current.options.forEach(option => {
     const button = document.createElement("button");
     button.className = "answer-button"; button.type = "button"; button.lang = reverse ? "en" : "fil"; button.textContent = reverse ? option.english : option.filipino;
@@ -245,18 +308,79 @@ function showQuestion() {
   });
 }
 
+function finishAnswer(question, correct, message) {
+  if (correct) score += 1;
+  else mistakes.push(question.word);
+  feedback.textContent = message;
+  feedback.classList.add(correct ? "good" : "try");
+  speak(question.word.phrase, !correct);
+  document.querySelector("#scoreText").textContent = `Score: ${score}`;
+  answerTimer = window.setTimeout(() => { questionIndex += 1; questionIndex < questions.length ? showQuestion() : showResults(); }, 2400);
+}
+
+function renderPhraseQuestion(question) {
+  document.querySelector("#quizLabel").textContent = question.type === "missing" ? "Complete the Filipino phrase" : "Build the Filipino sentence";
+  document.querySelector("#quizTitle").textContent = question.word.english;
+  const sentence = document.createElement("p");
+  sentence.className = "sentence-preview";
+  sentence.lang = "fil";
+  answerGrid.appendChild(sentence);
+  if (question.type === "missing") {
+    sentence.textContent = question.tokens.map((token, index) => index === question.missingIndex ? "____" : token).join(" ") + question.word.filipino.slice(-1);
+    question.options.forEach(option => {
+      const button = document.createElement("button");
+      button.type = "button"; button.className = "answer-button"; button.lang = "fil"; button.textContent = option;
+      button.addEventListener("click", () => {
+        answerGrid.querySelectorAll("button").forEach(item => { item.disabled = true; });
+        const correct = option === question.tokens[question.missingIndex];
+        button.classList.add(correct ? "correct" : "wrong");
+        sentence.textContent = question.word.filipino;
+        finishAnswer(question, correct, `${correct ? "Tama!" : "Try this:"} ${question.word.filipino}`);
+      });
+      answerGrid.appendChild(button);
+    });
+    return;
+  }
+  const selected = [];
+  const bank = document.createElement("div");
+  bank.className = "token-bank";
+  answerGrid.appendChild(bank);
+  const update = () => {
+    sentence.textContent = selected.length ? selected.map(item => item.token).join(" ") : "Tap the words in order.";
+    submit.disabled = selected.length !== question.tokens.length;
+  };
+  question.options.forEach(item => {
+    const button = document.createElement("button");
+    button.type = "button"; button.className = "answer-button"; button.lang = "fil"; button.textContent = item.token;
+    button.addEventListener("click", () => { selected.push({...item, button}); button.disabled = true; update(); });
+    bank.appendChild(button);
+  });
+  const undo = document.createElement("button");
+  undo.type = "button"; undo.className = "secondary-button"; undo.textContent = "Undo last word";
+  undo.addEventListener("click", () => { const item = selected.pop(); if (item) item.button.disabled = false; update(); });
+  const submit = document.createElement("button");
+  submit.type = "button"; submit.className = "primary-button"; submit.textContent = "Check sentence"; submit.disabled = true;
+  submit.addEventListener("click", () => {
+    const correct = selected.map(item => item.token).join(" ") === question.tokens.join(" ");
+    answerGrid.querySelectorAll("button").forEach(item => { item.disabled = true; });
+    sentence.textContent = question.word.filipino;
+    finishAnswer(question, correct, `${correct ? "Tama!" : "Try this:"} ${question.word.filipino}`);
+  });
+  answerGrid.append(undo, submit);
+  update();
+}
+
 function checkAnswer(button, selected, question) {
   const correct = question.word;
   const correctLabel = question.direction === "reverse" ? correct.english : correct.filipino;
   const buttons = [...answerGrid.querySelectorAll("button")];
   buttons.forEach(item => { item.disabled = true; });
   if (selected === correct) {
-    score += 1; button.classList.add("correct"); feedback.textContent = `Tama! ${correct.filipino} means ${correct.english}.`; feedback.classList.add("good"); speak(correct.phrase);
+    button.classList.add("correct");
   } else {
-    button.classList.add("wrong"); buttons.find(item => item.textContent === correctLabel)?.classList.add("correct"); feedback.textContent = `Almost! ${correct.filipino} means ${correct.english}.`; feedback.classList.add("try"); mistakes.push(correct); speak(correct.phrase, true);
+    button.classList.add("wrong"); buttons.find(item => item.textContent === correctLabel)?.classList.add("correct");
   }
-  document.querySelector("#scoreText").textContent = `Score: ${score}`;
-  window.setTimeout(() => { questionIndex += 1; questionIndex < questions.length ? showQuestion() : showResults(); }, 1600);
+  finishAnswer(question, selected === correct, `${selected === correct ? "Tama!" : "Almost!"} ${correct.filipino} means ${correct.english}.`);
 }
 
 function showResults() {
@@ -274,8 +398,8 @@ function showResults() {
     completedName = checkpoint.title;
     if (passed && activeQuiz.index < checkpoints.length - 1) nextText = ` Level ${activeQuiz.index + 2} is now unlocked!`;
   } else {
-    const lesson = lessons[currentLessonIndex];
-    const saved = lessonProgress();
+    const lesson = lessons[activeQuiz.index];
+    const saved = lessonProgress(activeQuiz.index);
     saved.bestScore = Math.max(saved.bestScore, score);
     if (passed) { saved.completed = true; saved.learned = lesson.words.map((_, index) => index); }
     completedName = lesson.title;
@@ -287,11 +411,12 @@ function showResults() {
   }
   document.querySelector("#resultBadge").textContent = passed ? "🌟" : "🌱";
   document.querySelector("#resultTitle").textContent = passed ? "Ang galing!" : "You’re growing!";
-  document.querySelector("#resultMessage").textContent = passed ? `You scored ${score} out of ${total} and completed ${completedName}.${nextText}` : `You scored ${score} out of ${total}. Review ${mistakes.length} word${mistakes.length === 1 ? "" : "s"} and try again. You need ${passingScore} correct to pass.`;
+  document.querySelector("#resultMessage").textContent = passed ? `You scored ${score} out of ${total} and completed ${completedName}.${nextText}` : `You scored ${score} out of ${total}. Review ${mistakes.length} missed answer${mistakes.length === 1 ? "" : "s"} and try again. You need ${passingScore} correct to pass.`;
   saveProgress(); renderLesson();
 }
 
 function beginQuiz(words, label, directionMode = "forward") {
+  window.clearTimeout(answerTimer);
   questions = makeQuestions(words, directionMode); questionIndex = 0; score = 0; mistakes = [];
   document.querySelector("#quizLabel").textContent = label;
   quizContent.classList.remove("hidden"); results.classList.add("hidden"); quizSection.classList.remove("hidden");
