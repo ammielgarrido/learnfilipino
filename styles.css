@@ -56,6 +56,7 @@ h2{font-size:clamp(2.2rem,4.5vw,3.5rem);line-height:1.05}
 .sentence-preview{grid-column:1/-1;min-height:60px;margin:0;padding:18px;border:1px dashed var(--green);border-radius:14px;font-size:1.2rem}
 .token-bank{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:10px}
 .token-bank .answer-button{min-height:48px}
+.listen-again{grid-column:1/-1;justify-self:center;margin-bottom:5px}.listening-answer{display:flex;min-height:128px;flex-direction:column;align-items:center;justify-content:center;gap:8px}.listening-answer>span{font-size:3rem;line-height:1}.listening-answer>img{width:58px;height:58px;object-fit:contain}.listening-answer>strong{font-size:.9rem}
 button:disabled{cursor:default}.primary-button:disabled{opacity:.5}
 .results{padding:20px 0 10px;text-align:center}.result-badge{margin-bottom:12px;font-size:5rem}.results p:not(.eyebrow){max-width:500px;margin:16px auto 24px;color:var(--muted)}.result-actions{display:flex;justify-content:center;gap:10px}
 .save-note{display:flex;align-items:center;gap:26px;margin-bottom:92px;padding:38px;border:1px dashed #aab9ae;border-radius:24px;background:rgba(255,255,255,.35)}.save-note>span{font-size:2.5rem}.save-note h2{font-size:2.25rem}.save-note p:not(.eyebrow){max-width:720px;margin-bottom:0;color:var(--muted)}

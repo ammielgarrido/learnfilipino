@@ -9,7 +9,7 @@ This file is the main curriculum reference for the Learn Filipino website. Updat
 - Let the learner mark words as practiced.
 - End every lesson with a 10-question quiz.
 - Require 8/10 to complete a lesson.
-- After every two lessons, test every word and phrase learned so far in a cumulative checkpoint.
+- After every two lessons, give a checkpoint. Levels 1–4 are cumulative; Level 5 tests the two new listening lessons.
 - Require 80% to complete a checkpoint.
 - Increase difficulty from single words to phrases, listening, recall, and simple conversation.
 
@@ -29,6 +29,9 @@ This file is the main curriculum reference for the Learn Filipino website. Updat
 | Level 4, Lesson 7 | Naming things and saying what you want | 10 questions: five missing-word, five sentence-building | Pass Level 3 Checkpoint |
 | Level 4, Lesson 8 | Finding things and going places | 10 questions: five missing-word, five sentence-building | Complete Lesson 7 |
 | Level 4 Checkpoint | All 60 words and 20 phrases from Lessons 1–8 | 80 questions: mixed-direction vocabulary plus phrase exercises | Complete Lessons 1–8 |
+| Level 5, Lesson 9 | Listen for everyday words | 10 audio-only prompts with picture choices | Pass Level 4 Checkpoint |
+| Level 5, Lesson 10 | Listen for useful sentences | 10 audio-only prompts with picture choices | Complete Lesson 9 |
+| Level 5 Checkpoint | Listening from Lessons 9–10 | 20 audio-only picture-choice questions | Complete Lessons 9–10 |
 
 ## Included vocabulary
 
@@ -158,6 +161,16 @@ Patterns: `Nasaan ang…?` (Where is the…?) and `Pupunta ako sa…` (I will go
 
 Phrase quizzes hide the final noun for missing-word questions. Sentence-building questions let learners tap shuffled words, undo the last selection, and submit when all words are selected. Each lesson includes five of each type. The Level 4 checkpoint includes all 80 entries once, with ten questions of each phrase type; passing requires 64/80.
 
+### Lesson 9: Listen for everyday words
+
+Reviews ten familiar words by sound: `Masaya`, `Takot`, `Bahay`, `Kutsara`, `Paaralan`, `Palengke`, `Guro`, `Magsasaka`, `Nanay`, and `Tubig`. The quiz hides the Filipino text and asks the learner to choose among four picture-and-English options.
+
+### Lesson 10: Listen for useful sentences
+
+Reviews ten familiar sentences by sound, using the Level 4 patterns `Ito ang…`, `Gusto ko ng…`, `Nasaan ang…?`, and `Pupunta ako sa…`. The quiz hides the Filipino sentence and asks the learner to choose the matching picture and English meaning.
+
+The Level 5 checkpoint combines all 20 listening prompts. Every question includes a replay button. The browser uses a Filipino device voice when one is available, so pronunciation must be checked on the learner's actual phone, tablet, or computer.
+
 ## Progress saving
 
 The current website uses browser `localStorage` and saves:
@@ -185,7 +198,7 @@ Implemented in Lessons 7–8: known words combined into `Ito ang…`, `Gusto ko 
 
 ### Level 5: Listening and speaking
 
-Play audio without showing the word, then ask the learner to choose the matching picture. Later, add optional microphone practice with clear parent permission and child-privacy safeguards.
+Implemented in Lessons 9–10: play audio without showing the Filipino word or phrase, then ask the learner to choose the matching picture and English meaning. Optional microphone practice remains a later addition and must include clear parent permission and child-privacy safeguards.
 
 ### Level 6: Mini conversations
 
@@ -204,4 +217,4 @@ Use short scenarios such as greeting family, asking for food, describing feeling
 
 ## Next recommended expansion
 
-Build Level 5 listening exercises: play audio without showing the word or phrase, then ask the learner to choose the matching visual. Verify Filipino pronunciation on target devices before publishing listening assessments. Optional microphone practice remains a later addition.
+Build Level 6 mini conversations. Start with two short, child-friendly scenarios: greeting family and asking for food. Mix picture choices, listening comprehension, and simple response selection while continuing to reuse known vocabulary. Verify Filipino phrasing and pronunciation with a fluent speaker before publishing.

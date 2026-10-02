@@ -98,14 +98,49 @@ const lessons = [
       ["I will go to the beach.", "Pupunta ako sa tabing-dagat.", "Pupunta ako sa tabing-dagat.", "🏖️"]
     ],
     patterns: "Nasaan ang…? = Where is the…? · Pupunta ako sa… = I will go to…"
+  },
+  {
+    id: "listening-1", level: 5, icon: "🎧", topic: "everyday sounds", title: "Listen for everyday words", listeningLesson: true,
+    prompt: "Listen carefully. What word do you hear?", phrase: "Makinig nang mabuti.",
+    words: [
+      ["Happy", "Masaya", "Masaya", "😊"],
+      ["Scared", "Takot", "Takot", "😨"],
+      ["House", "Bahay", "Bahay", "🏠"],
+      ["Spoon", "Kutsara", "Kutsara", "🥄"],
+      ["School", "Paaralan", "Paaralan", "🏫"],
+      ["Market", "Palengke", "Palengke", "🧺"],
+      ["Teacher", "Guro", "Guro", "👩‍🏫"],
+      ["Farmer", "Magsasaka", "Magsasaka", "🧑‍🌾"],
+      ["Mother", "Nanay", "Nanay", "👩"],
+      ["Water", "Tubig", "Tubig", "💧"]
+    ],
+    patterns: "Practice with the cards first. In the quiz, the Filipino word is heard—not shown."
+  },
+  {
+    id: "listening-2", level: 5, icon: "🔊", topic: "spoken sentences", title: "Listen for useful sentences", listeningLesson: true,
+    prompt: "Listen carefully. Which picture matches?", phrase: "Alin ang tamang larawan?",
+    words: [
+      ["This is the house.", "Ito ang bahay.", "Ito ang bahay.", "🏠"],
+      ["This is the chair.", "Ito ang upuan.", "Ito ang upuan.", "🪑"],
+      ["This is the spoon.", "Ito ang kutsara.", "Ito ang kutsara.", "🥄"],
+      ["I want rice.", "Gusto ko ng kanin.", "Gusto ko ng kanin.", "🍚"],
+      ["I want water.", "Gusto ko ng tubig.", "Gusto ko ng tubig.", "💧"],
+      ["Where is the table?", "Nasaan ang mesa?", "Nasaan ang mesa?", "", "assets/table.png"],
+      ["Where is the plate?", "Nasaan ang plato?", "Nasaan ang plato?", "🍽️"],
+      ["I will go to school.", "Pupunta ako sa paaralan.", "Pupunta ako sa paaralan.", "🏫"],
+      ["I will go to the park.", "Pupunta ako sa parke.", "Pupunta ako sa parke.", "🌳"],
+      ["I will go to the beach.", "Pupunta ako sa tabing-dagat.", "Pupunta ako sa tabing-dagat.", "🏖️"]
+    ],
+    patterns: "Listen to the complete sentence, then match it to the picture and English meaning."
   }
-].map(lesson => ({...lesson, words: lesson.words.map(([english, filipino, phrase, emoji, image]) => ({english, filipino, phrase, emoji, image, phraseLesson: !!lesson.phraseLesson}))}));
+].map(lesson => ({...lesson, words: lesson.words.map(([english, filipino, phrase, emoji, image]) => ({english, filipino, phrase, emoji, image, phraseLesson: !!lesson.phraseLesson, listeningLesson: !!lesson.listeningLesson}))}));
 
 const checkpoints = [
   {id: "checkpoint-1", title: "Level 1 Checkpoint", icon: "🏅", lessonCount: 2, detail: "All 20 words from Lessons 1–2"},
   {id: "checkpoint-2", title: "Level 2 Checkpoint", icon: "🏆", lessonCount: 4, detail: "All 40 words from Lessons 1–4"},
   {id: "checkpoint-3", title: "Level 3 Checkpoint", icon: "🌟", lessonCount: 6, detail: "All 60 words from Lessons 1–6", mixedDirections: true},
-  {id: "checkpoint-4", title: "Level 4 Checkpoint", icon: "💬", lessonCount: 8, detail: "All 60 words and 20 phrases from Lessons 1–8", mixedDirections: true}
+  {id: "checkpoint-4", title: "Level 4 Checkpoint", icon: "💬", lessonCount: 8, detail: "All 60 words and 20 phrases from Lessons 1–8", mixedDirections: true},
+  {id: "checkpoint-5", title: "Level 5 Checkpoint", icon: "🎧", lessonCount: 10, lessonStart: 8, detail: "20 listening challenges from Lessons 9–10"}
 ];
 
 const storageKey = "learn-filipino:course-progress-v2";
@@ -160,7 +195,7 @@ function isUnlocked(index) {
   const checkpointBeforeLevel = checkpoints.find(checkpoint => checkpoint.lessonCount === index);
   return !checkpointBeforeLevel || progress.checkpoints[checkpointBeforeLevel.id].completed;
 }
-function checkpointWords(checkpoint) { return lessons.slice(0, checkpoint.lessonCount).flatMap(lesson => lesson.words); }
+function checkpointWords(checkpoint) { return lessons.slice(checkpoint.lessonStart || 0, checkpoint.lessonCount).flatMap(lesson => lesson.words); }
 function isCheckpointUnlocked(checkpoint) { return reviewMode || lessons.slice(0, checkpoint.lessonCount).every(lesson => progress.lessons[lesson.id].completed); }
 
 function speak(text, slow = false) {
@@ -222,7 +257,8 @@ function renderLesson() {
   document.querySelector("#heroPrompt").textContent = lesson.prompt;
   document.querySelector("#heroPhrase").textContent = lesson.phrase;
   document.querySelector("#lessonTitle").textContent = lesson.title;
-  document.querySelector("#lessonLabel").textContent = `${lesson.phraseLesson ? "Ten useful phrases" : "Ten new words"} · Best quiz ${saved.bestScore}/10`;
+  const lessonKind = lesson.listeningLesson ? "Ten listening challenges" : lesson.phraseLesson ? "Ten useful phrases" : "Ten new words";
+  document.querySelector("#lessonLabel").textContent = `${lessonKind} · Best quiz ${saved.bestScore}/10`;
   document.querySelector("#patternNote").textContent = lesson.patterns || "";
   document.querySelector("#patternNote").classList.toggle("hidden", !lesson.patterns);
   wordGrid.innerHTML = "";
@@ -269,6 +305,10 @@ function makeQuestions(words, directionMode = "forward") {
   const ordered = shuffle(words);
   let phraseIndex = 0;
   return ordered.map((word, index) => {
+    if (word.listeningLesson) {
+      const listeningWords = words.filter(candidate => candidate.listeningLesson);
+      return {word, type: "listening", options: shuffle([word, ...shuffle(listeningWords.filter(candidate => candidate !== word)).slice(0, 3)])};
+    }
     if (word.phraseLesson) {
       const type = phraseIndex++ % 2 ? "build" : "missing";
       const tokens = phraseTokens(word);
@@ -296,6 +336,11 @@ function showQuestion() {
   document.querySelector("#quizLabel").textContent = activeQuiz.type === "checkpoint" ? `${checkpoints[activeQuiz.index].title} · Cumulative review` : "English ↔ Filipino challenge";
   document.querySelector("#quizTitle").textContent = reverse ? `What does “${current.word.filipino}” mean?` : `Which word means “${current.word.english}”?`;
   feedback.textContent = ""; feedback.className = "feedback"; answerGrid.innerHTML = "";
+  if (current.type === "listening") {
+    renderListeningQuestion(current);
+    window.setTimeout(() => speak(current.word.phrase), 250);
+    return;
+  }
   if (current.type === "missing" || current.type === "build") {
     renderPhraseQuestion(current);
     return;
@@ -306,6 +351,41 @@ function showQuestion() {
     button.addEventListener("click", () => checkAnswer(button, option, current));
     answerGrid.appendChild(button);
   });
+}
+
+function renderListeningQuestion(question) {
+  const quizVisual = document.querySelector("#quizEmoji");
+  quizVisual.textContent = "🎧";
+  document.querySelector("#quizLabel").textContent = "Listening challenge";
+  document.querySelector("#quizTitle").textContent = "What did you hear?";
+  const replay = document.createElement("button");
+  replay.type = "button";
+  replay.className = "secondary-button listen-again";
+  replay.innerHTML = '<span aria-hidden="true">🔊</span> Play sound again';
+  replay.addEventListener("click", () => speak(question.word.phrase));
+  answerGrid.appendChild(replay);
+  question.options.forEach(option => {
+    const button = document.createElement("button");
+    button.className = "answer-button listening-answer";
+    button.type = "button";
+    button.setAttribute("aria-label", option.english);
+    const visual = option.image ? `<img src="${option.image}" alt="">` : `<span aria-hidden="true">${option.emoji}</span>`;
+    button.innerHTML = `${visual}<strong>${option.english}</strong>`;
+    button.addEventListener("click", () => checkListeningAnswer(button, option, question));
+    answerGrid.appendChild(button);
+  });
+}
+
+function checkListeningAnswer(button, selected, question) {
+  const buttons = [...answerGrid.querySelectorAll(".listening-answer")];
+  buttons.forEach(item => { item.disabled = true; });
+  if (selected === question.word) button.classList.add("correct");
+  else {
+    button.classList.add("wrong");
+    const correctIndex = question.options.indexOf(question.word);
+    buttons[correctIndex]?.classList.add("correct");
+  }
+  finishAnswer(question, selected === question.word, `${selected === question.word ? "Tama!" : "Almost!"} ${question.word.filipino} means ${question.word.english}`);
 }
 
 function finishAnswer(question, correct, message) {
@@ -426,14 +506,15 @@ function beginQuiz(words, label, directionMode = "forward") {
 function startQuiz() {
   activeQuiz = {type: "lesson", index: currentLessonIndex};
   const lesson = lessons[currentLessonIndex];
-  beginQuiz(lesson.words, lesson.reverseQuiz ? "English ↔ Filipino challenge" : "Choose the Filipino word", lesson.reverseQuiz ? "mixed" : "forward");
+  const label = lesson.listeningLesson ? "Listening challenge" : lesson.reverseQuiz ? "English ↔ Filipino challenge" : "Choose the Filipino word";
+  beginQuiz(lesson.words, label, lesson.reverseQuiz ? "mixed" : "forward");
 }
 
 function startCheckpoint(index) {
   const checkpoint = checkpoints[index];
   if (!isCheckpointUnlocked(checkpoint)) return;
   activeQuiz = {type: "checkpoint", index};
-  beginQuiz(checkpointWords(checkpoint), `${checkpoint.title} · Every learned word`, checkpoint.mixedDirections ? "mixed" : "forward");
+  beginQuiz(checkpointWords(checkpoint), checkpoint.lessonStart ? `${checkpoint.title} · Listening review` : `${checkpoint.title} · Every learned word`, checkpoint.mixedDirections ? "mixed" : "forward");
 }
 
 function retryActiveQuiz() {
