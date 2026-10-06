@@ -190,7 +190,7 @@ Reviews ten familiar words by sound: `Masaya`, `Takot`, `Bahay`, `Kutsara`, `Paa
 
 Reviews ten familiar sentences by sound, using the Level 4 patterns `Ito ang…`, `Gusto ko ng…`, `Nasaan ang…?`, and `Pupunta ako sa…`. The quiz hides the Filipino sentence and asks the learner to choose the matching picture and English meaning.
 
-The Level 5 checkpoint combines all 20 listening prompts. Every question includes a replay button. The browser uses a Filipino device voice when one is available, so pronunciation must be checked on the learner's actual phone, tablet, or computer.
+The Level 5 checkpoint combines all 20 listening prompts. Every question includes a replay button. The site uses the family's human recordings for the 60 vocabulary words and 20 Level 4 sentences, with the device's Filipino voice retained only as a fallback for unrecorded text.
 
 ## Progress saving
 

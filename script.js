@@ -133,7 +133,12 @@ const lessons = [
     ],
     patterns: "Listen to the complete sentence, then match it to the picture and English meaning."
   }
-].map(lesson => ({...lesson, words: lesson.words.map(([english, filipino, phrase, emoji, image]) => ({english, filipino, phrase, emoji, image, phraseLesson: !!lesson.phraseLesson, listeningLesson: !!lesson.listeningLesson}))}));
+].map(lesson => ({...lesson, words: lesson.words.map(([english, filipino, phrase, emoji, image]) => ({
+  english, filipino, phrase, emoji, image,
+  phraseLesson: !!lesson.phraseLesson,
+  listeningLesson: !!lesson.listeningLesson,
+  audioText: lesson.phraseLesson || lesson.listeningLesson ? phrase : filipino
+}))}));
 
 const checkpoints = [
   {id: "checkpoint-1", title: "Level 1 Checkpoint", icon: "🏅", lessonCount: 2, detail: "All 20 words from Lessons 1–2"},
@@ -150,6 +155,93 @@ let currentLessonIndex = Math.min(progress.currentLesson || 0, lessons.length - 
 let questions = [], questionIndex = 0, score = 0, mistakes = [];
 let activeQuiz = {type: "lesson", index: currentLessonIndex};
 let answerTimer;
+let activeAudioTimer;
+let audioRequest = 0;
+
+const recordedAudio = new Map([
+  ["masaya", [0.000, 0.860]],
+  ["malungkot", [0.940, 0.920]],
+  ["galit", [1.940, 0.620]],
+  ["takot", [2.640, 0.680]],
+  ["pagod", [3.400, 0.740]],
+  ["nagulat", [4.220, 0.780]],
+  ["nahihiya", [5.080, 0.940]],
+  ["gutom", [6.100, 0.740]],
+  ["uhaw", [6.920, 0.760]],
+  ["sabik", [7.760, 0.580]],
+  ["bahay", [8.420, 0.740]],
+  ["mesa", [9.240, 0.700]],
+  ["upuan", [10.020, 0.920]],
+  ["pinto", [11.020, 0.780]],
+  ["bintana", [11.880, 0.920]],
+  ["kama", [12.880, 0.640]],
+  ["lampara", [13.600, 0.820]],
+  ["kutsara", [14.500, 0.920]],
+  ["plato", [15.500, 0.860]],
+  ["tasa", [16.440, 0.520]],
+  ["paaralan", [17.040, 0.980]],
+  ["parke", [18.100, 0.840]],
+  ["palengke", [19.020, 0.860]],
+  ["ospital", [19.960, 0.920]],
+  ["simbahan", [20.960, 0.860]],
+  ["tindahan", [21.900, 0.800]],
+  ["aklatan", [22.780, 0.920]],
+  ["tabing-dagat", [23.780, 1.020]],
+  ["palaruan", [24.880, 1.060]],
+  ["bukid", [26.020, 0.720]],
+  ["guro", [26.820, 0.780]],
+  ["doktor", [27.680, 0.780]],
+  ["nars", [28.540, 0.640]],
+  ["pulis", [29.260, 0.620]],
+  ["bumbero", [29.960, 0.960]],
+  ["magsasaka", [31.000, 1.000]],
+  ["tagapagluto", [32.080, 1.120]],
+  ["drayber", [33.280, 0.780]],
+  ["karpintero", [34.140, 1.100]],
+  ["dentista", [35.320, 0.980]],
+  ["pamilya", [36.380, 0.800]],
+  ["nanay", [37.260, 0.700]],
+  ["tatay", [38.040, 0.720]],
+  ["ate", [38.840, 0.740]],
+  ["kuya", [39.660, 0.720]],
+  ["lolo", [40.460, 0.820]],
+  ["lola", [41.360, 0.760]],
+  ["anak", [42.200, 0.580]],
+  ["tita", [42.860, 0.700]],
+  ["tito", [43.640, 0.660]],
+  ["kanin", [44.380, 0.820]],
+  ["tinapay", [45.280, 0.900]],
+  ["isda", [46.260, 0.700]],
+  ["manok", [47.040, 0.580]],
+  ["itlog", [47.700, 0.680]],
+  ["prutas", [48.460, 0.680]],
+  ["gulay", [49.220, 0.760]],
+  ["tubig", [50.060, 0.660]],
+  ["gatas", [50.800, 0.700]],
+  ["katas", [51.580, 0.600]],
+  ["ito-ang-bahay", [52.260, 1.140]],
+  ["ito-ang-mesa", [53.480, 1.260]],
+  ["ito-ang-upuan", [54.820, 1.340]],
+  ["ito-ang-kutsara", [56.240, 1.300]],
+  ["ito-ang-plato", [57.620, 1.240]],
+  ["gusto-ko-ng-kanin", [58.940, 1.380]],
+  ["gusto-ko-ng-tinapay", [60.400, 1.460]],
+  ["gusto-ko-ng-tubig", [61.940, 1.360]],
+  ["gusto-ko-ng-gatas", [63.380, 1.240]],
+  ["gusto-ko-ng-prutas", [64.700, 1.340]],
+  ["nasaan-ang-bahay", [66.120, 1.320]],
+  ["nasaan-ang-mesa", [67.520, 1.320]],
+  ["nasaan-ang-upuan", [68.920, 1.400]],
+  ["nasaan-ang-kutsara", [70.400, 1.400]],
+  ["nasaan-ang-plato", [71.880, 1.220]],
+  ["pupunta-ako-sa-paaralan", [73.180, 1.780]],
+  ["pupunta-ako-sa-parke", [75.040, 1.680]],
+  ["pupunta-ako-sa-palengke", [76.800, 1.600]],
+  ["pupunta-ako-sa-tindahan", [78.480, 1.580]],
+  ["pupunta-ako-sa-tabing-dagat", [80.140, 1.760]],
+]);
+const recordedPlayer = new Audio("assets/audio/course-audio.m4a");
+recordedPlayer.preload = "metadata";
 
 const wordGrid = document.querySelector("#wordGrid");
 const courseGrid = document.querySelector("#courseGrid");
@@ -198,7 +290,12 @@ function isUnlocked(index) {
 function checkpointWords(checkpoint) { return lessons.slice(checkpoint.lessonStart || 0, checkpoint.lessonCount).flatMap(lesson => lesson.words); }
 function isCheckpointUnlocked(checkpoint) { return reviewMode || lessons.slice(0, checkpoint.lessonCount).every(lesson => progress.lessons[lesson.id].completed); }
 
-function speak(text, slow = false) {
+function audioSlug(text) {
+  return text.toLocaleLowerCase("fil-PH").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9-]+/g, "-").replace(/^-|-$/g, "");
+}
+
+function speakWithDeviceVoice(text, slow = false) {
   if (!("speechSynthesis" in window)) { alert("Audio is not supported in this browser yet."); return; }
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
@@ -207,6 +304,36 @@ function speak(text, slow = false) {
   const voice = window.speechSynthesis.getVoices().find(item => /^(fil|tl)(-|_)/i.test(item.lang));
   if (voice) utterance.voice = voice;
   window.speechSynthesis.speak(utterance);
+}
+
+function speak(text, slow = false) {
+  window.speechSynthesis?.cancel();
+  window.clearTimeout(activeAudioTimer);
+  recordedPlayer.pause();
+  const request = ++audioRequest;
+  const slug = audioSlug(text);
+  const segment = recordedAudio.get(slug);
+  if (!segment) { speakWithDeviceVoice(text, slow); return; }
+  let usedFallback = false;
+  const fallback = () => {
+    if (usedFallback || request !== audioRequest) return;
+    usedFallback = true;
+    speakWithDeviceVoice(text, slow);
+  };
+  const playSegment = () => {
+    if (request !== audioRequest) return;
+    const [start, duration] = segment;
+    recordedPlayer.currentTime = start;
+    recordedPlayer.playbackRate = slow ? .82 : 1;
+    recordedPlayer.play().then(() => {
+      activeAudioTimer = window.setTimeout(() => {
+        if (request === audioRequest) recordedPlayer.pause();
+      }, (duration / recordedPlayer.playbackRate + .06) * 1000);
+    }).catch(fallback);
+  };
+  recordedPlayer.addEventListener("error", fallback, {once: true});
+  if (recordedPlayer.readyState >= 1) playSegment();
+  else recordedPlayer.addEventListener("loadedmetadata", playSegment, {once: true});
 }
 
 function updateHeaderProgress() {
@@ -275,7 +402,7 @@ function renderLesson() {
     };
     card.addEventListener("click", event => { if (!event.target.closest(".sound-button")) mark(); });
     card.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); mark(); } });
-    card.querySelector(".sound-button").addEventListener("click", () => { mark(); speak(word.phrase); });
+    card.querySelector(".sound-button").addEventListener("click", () => { mark(); speak(word.audioText); });
     wordGrid.appendChild(card);
   });
   updateHeaderProgress();
@@ -338,7 +465,7 @@ function showQuestion() {
   feedback.textContent = ""; feedback.className = "feedback"; answerGrid.innerHTML = "";
   if (current.type === "listening") {
     renderListeningQuestion(current);
-    window.setTimeout(() => speak(current.word.phrase), 250);
+    window.setTimeout(() => speak(current.word.audioText), 250);
     return;
   }
   if (current.type === "missing" || current.type === "build") {
@@ -362,7 +489,7 @@ function renderListeningQuestion(question) {
   replay.type = "button";
   replay.className = "secondary-button listen-again";
   replay.innerHTML = '<span aria-hidden="true">🔊</span> Play sound again';
-  replay.addEventListener("click", () => speak(question.word.phrase));
+  replay.addEventListener("click", () => speak(question.word.audioText));
   answerGrid.appendChild(replay);
   question.options.forEach(option => {
     const button = document.createElement("button");
@@ -393,7 +520,7 @@ function finishAnswer(question, correct, message) {
   else mistakes.push(question.word);
   feedback.textContent = message;
   feedback.classList.add(correct ? "good" : "try");
-  speak(question.word.phrase, !correct);
+  speak(question.word.audioText, !correct);
   document.querySelector("#scoreText").textContent = `Score: ${score}`;
   answerTimer = window.setTimeout(() => { questionIndex += 1; questionIndex < questions.length ? showQuestion() : showResults(); }, 2400);
 }
